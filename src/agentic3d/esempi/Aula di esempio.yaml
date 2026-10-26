@@ -1,0 +1,39 @@
+# Aula dallo schizzo a mano libera "Schizzo aula.webp" (20 ottobre 2026).
+# Quote dello schizzo, tutte al filo interno dei muri: 8,00 x 6,00 m = 48,00 m2, altezza 3,00 m.
+# Sistema di riferimento: origine nell'angolo interno sud-ovest, X est, Y nord, Z alto, metri.
+# Orientamento: pianta con il nord in alto. Ovest = corridoio, est = esterno, nord e sud = altre aule.
+
+progetto: Aula di esempio
+comune: Roma
+destinazione: scuola
+intervento: nuova
+
+note_verifica:
+  - "Con l'indice di 1,80 m2 per alunno (DM 18 dicembre 1975, tabelle 6 e 7) l'aula da 48,00 m2 ospita al massimo 26 alunni (48 / 1,80 = 26,7). Per far controllare l'indice scrivi `alunni: N` nella stanza."
+  - "La finestra misura 6,00 m2 su 48,00 m2 (rapporto 0,125). Il decreto non fissa un rapporto tra finestra e pavimento: chiede un fattore medio di luce diurna di 0,03, da calcolare con una simulazione."
+
+ipotesi_applicate:
+  - "Finestra: 4 ante da 1,00 m (lo schizzo mostra una finestra a nastro senza divisioni leggibili)"
+  - "Porta: cerniera sul lato sud, apertura verso l'interno, maniglia sul lato nord (dallo schizzo l'arco di apertura parte dal montante sud)"
+  - "Muri: sezione piena, senza fascia di colore (lo schizzo non indica finiture); nessun arredo, come nello schizzo"
+
+stanza:
+  id: Aula
+  tipo: aula
+  lunghezza_m: 8.00        # asse X, ovest-est (quota 8.00 dello schizzo)
+  larghezza_m: 6.00        # asse Y, sud-nord (quota 6.00)
+  altezza_m: 3.00          # h = 3.00
+  pareti:
+    ovest: {spessore_m: 0.10}   # corridoio, s = 10 cm
+    nord: {spessore_m: 0.10}    # altre aule, s = 10 cm
+    sud: {spessore_m: 0.10}     # altre aule, s = 10 cm
+    est: {spessore_m: 0.30}     # esterno, s = 30 cm
+
+  aperture:
+    # porta sul corridoio: dal muro nord 4,50 m, poi la luce di 0,90 m, poi 0,60 m fino al muro sud (4,50 + 0,90 + 0,60 = 6,00)
+    - {id: Porta, tipo: porta, parete: ovest, da_m: 0.60, larghezza_m: 0.90, altezza_m: 2.10, ingresso: true, cerniera: sud}
+    # finestra a nastro sulla parete esterna: 1,00 m di muro, 4,00 m di luce, 1,00 m di muro (1,00 + 4,00 + 1,00 = 6,00)
+    # la quota del davanzale non è nello schizzo: la sceglie `completa()` (1,00 m) e la dichiara tra le ipotesi
+    - {id: Finestra, tipo: finestra, parete: est, da_m: 1.00, larghezza_m: 4.00, altezza_m: 1.50, ante: 4}
+
+  arredi: []

@@ -1,0 +1,173 @@
+# Regole sull'igiene e le dimensioni minime delle abitazioni (Italia).
+# Ogni regola ha fonte, articolo, ambito e data di verifica. Valori non riprodotti a memoria:
+# letti dal testo indicato in `fonte.letto_da`.
+#
+# Quantità usate dal controllore (vedi src/agentic3d/controllo.py):
+#   altezza_m, superficie_m2, rapporto_aeroilluminante, finestra_apribile_presente,
+#   bagno_ventilato
+#
+# Avviso: il controllo non sostituisce la responsabilità del tecnico abilitato.
+
+_fonti:
+  dm1975: &dm1975
+    atto: "Decreto ministeriale Sanità 5 luglio 1975 (G.U. n. 190 del 18 luglio 1975)"
+    letto_da: "copia del testo su cornaviera.it, concorde con altre quattro copie; estratti riscontrati il 21 ottobre 2026 sulla copia PDF di indicenormativa.it; non ancora riscontrato su Gazzetta Ufficiale"
+    url: "https://www.indicenormativa.it/sites/default/files/Decreto%20Ministero%20della%20Sanita%2005-07-1975.pdf"
+    livello_fonte: copia
+    data_verifica: 2026-10-21
+
+regole:
+  - id: DM1975-art1-altezza-abitabili
+    titolo: Altezza minima interna utile dei locali abitabili
+    fonte: {<<: *dm1975, articolo: "art. 1", estratto: "L'altezza minima interna utile dei locali adibiti ad abitazione è fissata in m 2,70, riducibili a m 2,40 per i corridoi, i disimpegni in genere, i bagni, i gabinetti ed i ripostigli."}
+    ambito: IT
+    destinazione: [abitazione]
+    interventi: [nuova, ristrutturazione, esistente]
+    locali: [camera_singola, camera_doppia, soggiorno, cucina, monostanza_1p, monostanza_2p]
+    grandezza: altezza_m
+    operatore: ">="
+    valore: 2.70
+    deroghe:
+      - id: montagna
+        condizione: {altitudine_m_minima: 1000}
+        valore: 2.55
+        fonte: {<<: *dm1975, articolo: "art. 1, comma 2", estratto: "una riduzione dell'altezza minima dei locali abitabili a m 2,55"}
+        nota: "Comuni montani oltre 1000 m sul livello del mare, con considerazione del clima e della tipologia."
+      - id: salva-casa
+        condizione: {intervento: [esistente, ristrutturazione], asseverazione_salva_casa: true, adattabilita_verificata: true, recupero_o_progetto_alternativo: true}
+        valore: 2.40
+        fonte: &tue24
+          atto: "DPR 380/2001 (Testo Unico Edilizia), come modificato dal DL 69/2024 convertito nella L. 105/2024"
+          articolo: "art. 24, commi 5-bis e 5-ter"
+          letto_da: "normattiva.it"
+          livello_fonte: primaria
+          data_verifica: 2026-10-20
+        nota: "Il progettista abilitato può asseverare la conformità igienico-sanitaria. Servono l'adattabilità secondo il DM 236/1989 e almeno una condizione: locali in edificio sottoposto a recupero edilizio con miglioramento igienico-sanitario, oppure progetto di ristrutturazione con soluzioni alternative."
+
+  - id: DM1975-art1-altezza-servizi
+    titolo: Altezza minima di corridoi, disimpegni, bagni, gabinetti e ripostigli
+    fonte: {<<: *dm1975, articolo: "art. 1, comma 1", estratto: "L'altezza minima interna utile dei locali adibiti ad abitazione è fissata in m 2,70, riducibili a m 2,40 per i corridoi, i disimpegni in genere, i bagni, i gabinetti ed i ripostigli."}
+    ambito: IT
+    destinazione: [abitazione]
+    interventi: [nuova, ristrutturazione, esistente]
+    locali: [corridoio, disimpegno, bagno, ripostiglio]
+    grandezza: altezza_m
+    operatore: ">="
+    valore: 2.40
+
+  - id: DM1975-art2-camera-singola
+    titolo: Superficie minima della camera da letto per una persona
+    fonte: {<<: *dm1975, articolo: "art. 2", estratto: "Le stanze da letto debbono avere una superficie minima di mq 9, se per una persona, e di mq 14, se per due persone."}
+    ambito: IT
+    destinazione: [abitazione]
+    interventi: [nuova, ristrutturazione, esistente]
+    locali: [camera_singola]
+    grandezza: superficie_m2
+    operatore: ">="
+    valore: 9.0
+
+  - id: DM1975-art2-camera-doppia
+    titolo: Superficie minima della camera da letto per due persone
+    fonte: {<<: *dm1975, articolo: "art. 2", estratto: "Le stanze da letto debbono avere una superficie minima di mq 9, se per una persona, e di mq 14, se per due persone."}
+    ambito: IT
+    destinazione: [abitazione]
+    interventi: [nuova, ristrutturazione, esistente]
+    locali: [camera_doppia]
+    grandezza: superficie_m2
+    operatore: ">="
+    valore: 14.0
+
+  - id: DM1975-art2-soggiorno
+    titolo: Superficie minima del soggiorno
+    fonte: {<<: *dm1975, articolo: "art. 2", estratto: "Ogni alloggio deve essere dotato di una stanza di soggiorno di almeno mq 14."}
+    ambito: IT
+    destinazione: [abitazione]
+    interventi: [nuova, ristrutturazione, esistente]
+    locali: [soggiorno]
+    grandezza: superficie_m2
+    operatore: ">="
+    valore: 14.0
+
+  - id: DM1975-art3-monostanza-1p
+    titolo: Superficie minima dell'alloggio monostanza per una persona (servizi inclusi)
+    fonte: {<<: *dm1975, articolo: "art. 3", estratto: "l'alloggio monostanza, per una persona, deve avere una superficie minima, comprensiva dei servizi, non inferiore a mq 28, e non inferiore a mq 38, se per due persone."}
+    ambito: IT
+    destinazione: [abitazione]
+    interventi: [nuova, ristrutturazione, esistente]
+    locali: [monostanza_1p]
+    grandezza: superficie_m2
+    operatore: ">="
+    valore: 28.0
+    deroghe:
+      - id: salva-casa
+        condizione: {intervento: [esistente, ristrutturazione], asseverazione_salva_casa: true, adattabilita_verificata: true, recupero_o_progetto_alternativo: true}
+        valore: 20.0
+        fonte: *tue24
+
+  - id: DM1975-art3-monostanza-2p
+    titolo: Superficie minima dell'alloggio monostanza per due persone (servizi inclusi)
+    fonte: {<<: *dm1975, articolo: "art. 3", estratto: "l'alloggio monostanza, per una persona, deve avere una superficie minima, comprensiva dei servizi, non inferiore a mq 28, e non inferiore a mq 38, se per due persone."}
+    ambito: IT
+    destinazione: [abitazione]
+    interventi: [nuova, ristrutturazione, esistente]
+    locali: [monostanza_2p]
+    grandezza: superficie_m2
+    operatore: ">="
+    valore: 38.0
+    deroghe:
+      - id: salva-casa
+        condizione: {intervento: [esistente, ristrutturazione], asseverazione_salva_casa: true, adattabilita_verificata: true, recupero_o_progetto_alternativo: true}
+        valore: 28.0
+        fonte: *tue24
+
+  - id: DM1975-art2-finestra-apribile
+    titolo: Camere da letto, soggiorno e cucina devono avere una finestra apribile
+    fonte: {<<: *dm1975, articolo: "art. 2", estratto: "Le stanze da letto, il soggiorno e la cucina debbono essere provvisti di finestra apribile."}
+    ambito: IT
+    destinazione: [abitazione]
+    interventi: [nuova, ristrutturazione, esistente]
+    locali: [camera_singola, camera_doppia, soggiorno, cucina, monostanza_1p, monostanza_2p]
+    grandezza: finestra_apribile_presente
+    operatore: "=="
+    valore: true
+
+  - id: DM1975-art5-rapporto-aeroilluminante
+    titolo: Superficie finestrata apribile non inferiore a 1/8 della superficie del pavimento
+    fonte: {<<: *dm1975, articolo: "art. 5", estratto: "la superficie finestrata apribile non dovrà essere inferiore a 1/8 della superficie del pavimento."}
+    ambito: IT
+    destinazione: [abitazione]
+    interventi: [nuova, ristrutturazione, esistente]
+    locali: [camera_singola, camera_doppia, soggiorno, cucina, monostanza_1p, monostanza_2p]
+    grandezza: rapporto_aeroilluminante
+    operatore: ">="
+    valore: 0.125
+    valori_nel_testo: ["1/8"]
+    nota: "Il rapporto si calcola sulla superficie apribile della finestra, non sul vano murario. Il regolamento comunale può chiedere di più (non verificato)."
+
+  - id: DM1975-art7-bagno-ventilazione
+    titolo: Il bagno ha apertura verso l'esterno oppure aspirazione meccanica
+    fonte: {<<: *dm1975, articolo: "art. 7", estratto: "La stanza da bagno deve essere fornita di apertura all'esterno per il ricambio dell'aria o dotata di impianto di aspirazione meccanica."}
+    ambito: IT
+    destinazione: [abitazione]
+    interventi: [nuova, ristrutturazione, esistente]
+    locali: [bagno]
+    grandezza: bagno_ventilato
+    operatore: "=="
+    valore: true
+    nota: "Nei bagni senza apertura esterna sono vietati apparecchi a fiamma libera."
+
+# Verifiche che il controllore NON calcola: vanno fatte a mano o con simulazione e finiscono
+# nel rapporto come "NON VERIFICABILE".
+non_automatizzate:
+  - id: DM1975-art5-fattore-luce-diurna
+    titolo: Fattore di luce diurna medio non inferiore al 2% nei locali con illuminazione naturale diretta
+    fonte: {<<: *dm1975, articolo: "art. 5", estratto: "assicurare un valore di fattore luce diurna medio non inferiore al 2 per cento"}
+    motivo: "Richiede una simulazione di luce naturale o un calcolo specifico."
+  - id: DM1975-art2-superficie-per-abitante
+    titolo: Superficie abitabile di almeno 14 m2 per i primi 4 abitanti e 10 m2 per ciascuno dei successivi
+    fonte: {<<: *dm1975, articolo: "art. 2", estratto: "Per ogni abitante deve essere assicurata una superficie abitabile non inferiore a mq 14, per i primi 4 abitanti, ed a mq 10, per ciascuno dei successivi."}
+    motivo: "La definizione di superficie abitabile e dei locali che vi rientrano va confermata dal tecnico."
+  - id: DM1975-art4-temperature
+    titolo: Temperatura di progetto dell'aria interna tra 18 e 20 gradi nei locali abitati
+    fonte: {<<: *dm1975, articolo: "art. 4"}
+    motivo: "Riguarda l'impianto, non la geometria del modello."

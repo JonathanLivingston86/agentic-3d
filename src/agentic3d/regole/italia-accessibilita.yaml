@@ -1,0 +1,178 @@
+# Regole di accessibilità, adattabilità e visitabilità (Italia).
+# Fonte: DM Lavori Pubblici 14 giugno 1989, n. 236, art. 8 (specifiche funzionali e dimensionali).
+# Testo letto su normattiva.it il 20 ottobre 2026.
+#
+# Campo di applicazione (art. 1): edifici privati di nuova costruzione, edilizia residenziale pubblica
+# di nuova costruzione, ristrutturazione degli stessi anche se preesistenti, spazi esterni di pertinenza.
+# Per `intervento: esistente` (senza ristrutturazione) il controllore risponde "non applicabile".
+#
+# Avviso: il controllo non sostituisce la responsabilità del tecnico abilitato.
+
+_fonti:
+  dm236: &dm236
+    atto: "DM Lavori Pubblici 14 giugno 1989, n. 236 (G.U. n. 145 del 23-06-1989, S.O. n. 47)"
+    letto_da: "normattiva.it (20 ottobre 2026); estratti riscontrati il 21 ottobre 2026 sulla copia di consultazione handylex.org"
+    url: "https://handylex.org/decreto-del-ministro-dei-lavori-pubblici-14-giugno-1989-n-236/"
+    livello_fonte: primaria
+    data_verifica: 2026-10-21
+
+regole:
+  - id: DM236-art8.1.1-porta-ingresso
+    titolo: Luce netta della porta di accesso di ogni edificio e di ogni unità immobiliare
+    fonte: {<<: *dm236, articolo: "art. 8, punto 8.1.1", estratto: "La luce netta della porta di accesso di ogni edificio e di ogni unità immobiliare deve essere di almeno 80 cm. La luce netta delle altre porte deve essere di almeno 75 cm."}
+    ambito: IT
+    destinazione: [abitazione, altro]
+    interventi: [nuova, ristrutturazione]
+    elemento: porta_ingresso
+    grandezza: luce_netta_m
+    operatore: ">="
+    valore: 0.80
+    nota: "La luce netta è la larghezza utile di passaggio, al netto dell'ingombro dell'anta aperta a 90 gradi (art. 8.0.1)."
+
+  - id: DM236-art8.1.1-porta-interna
+    titolo: Luce netta delle altre porte
+    fonte: {<<: *dm236, articolo: "art. 8, punto 8.1.1", estratto: "La luce netta della porta di accesso di ogni edificio e di ogni unità immobiliare deve essere di almeno 80 cm. La luce netta delle altre porte deve essere di almeno 75 cm."}
+    ambito: IT
+    destinazione: [abitazione, altro]
+    interventi: [nuova, ristrutturazione]
+    elemento: porta_interna
+    grandezza: luce_netta_m
+    operatore: ">="
+    valore: 0.75
+
+  - id: DM236-art8.1.1-maniglia
+    titolo: Altezza delle maniglie delle porte tra 0,85 e 0,95 m (consigliata 0,90 m)
+    fonte: {<<: *dm236, articolo: "art. 8, punto 8.1.1", estratto: "L'altezza delle maniglie deve essere compresa tra 85 e 95 cm (consigliata 90 cm)."}
+    ambito: IT
+    destinazione: [abitazione, altro]
+    interventi: [nuova, ristrutturazione]
+    elemento: porta
+    grandezza: altezza_maniglia_m
+    operatore: tra
+    valore: [0.85, 0.95]
+
+  - id: DM236-art8.1.9-corridoio
+    titolo: Larghezza minima di corridoi e percorsi orizzontali
+    fonte: {<<: *dm236, articolo: "art. 8, punto 8.1.9", estratto: "I corridoi o i percorsi devono avere una larghezza minima di 100 cm"}
+    ambito: IT
+    destinazione: [abitazione, altro]
+    interventi: [nuova, ristrutturazione]
+    locali: [corridoio, disimpegno]
+    grandezza: larghezza_m
+    operatore: ">="
+    valore: 1.00
+    nota: "Servono allargamenti per l'inversione di marcia di una sedia a ruote, preferibilmente alle estremità e comunque ogni 10 m (non verificato dal controllore)."
+
+  - id: DM236-art8.1.8-parapetto
+    titolo: Altezza minima del parapetto di balconi e terrazze
+    fonte: {<<: *dm236, articolo: "art. 8, punto 8.1.8", estratto: "Il parapetto deve avere una altezza minima di 100 cm ed essere inattraversabile da una sfera di 10 cm di diametro."}
+    ambito: IT
+    destinazione: [abitazione, altro]
+    interventi: [nuova, ristrutturazione]
+    elemento: parapetto
+    grandezza: altezza_m
+    operatore: ">="
+    valore: 1.00
+    nota: "Il parapetto deve essere inattraversabile da una sfera di 10 cm di diametro (non verificato dal controllore)."
+
+  - id: DM236-art8.1.10-scala-privata-larghezza
+    titolo: Larghezza minima delle rampe di scale non comuni e non di uso pubblico
+    fonte: {<<: *dm236, articolo: "art. 8, punto 8.1.10", estratto: "Le rampe di scale che non costituiscono parte comune o non sono di uso pubblico devono avere una larghezza minima di 0,80 m."}
+    ambito: IT
+    destinazione: [abitazione, altro]
+    interventi: [nuova, ristrutturazione]
+    elemento: scala_privata
+    grandezza: larghezza_m
+    operatore: ">="
+    valore: 0.80
+
+  - id: DM236-art8.1.10-scala-privata-pedata
+    titolo: Pedata minima delle scale non comuni
+    fonte: {<<: *dm236, articolo: "art. 8, punto 8.1.10", estratto: "il già citato rapporto tra alzata e pedata (in questo caso minimo 25 cm)"}
+    ambito: IT
+    destinazione: [abitazione, altro]
+    interventi: [nuova, ristrutturazione]
+    elemento: scala_privata
+    grandezza: pedata_m
+    operatore: ">="
+    valore: 0.25
+
+  - id: DM236-art8.1.10-scala-comune-larghezza
+    titolo: Larghezza minima delle rampe di scale comuni o di uso pubblico
+    fonte: {<<: *dm236, articolo: "art. 8, punto 8.1.10", estratto: "Le rampe di scale che costituiscono parte comune o siano di uso pubblico devono avere una larghezza minima di 1,20 m"}
+    ambito: IT
+    destinazione: [abitazione, altro]
+    interventi: [nuova, ristrutturazione]
+    elemento: scala_comune
+    grandezza: larghezza_m
+    operatore: ">="
+    valore: 1.20
+
+  - id: DM236-art8.1.10-scala-comune-pedata
+    titolo: Pedata minima delle scale comuni
+    fonte: {<<: *dm236, articolo: "art. 8, punto 8.1.10", estratto: "corretto rapporto tra alzata e pedata (pedata minimo di 30 cm)"}
+    ambito: IT
+    destinazione: [abitazione, altro]
+    interventi: [nuova, ristrutturazione]
+    elemento: scala_comune
+    grandezza: pedata_m
+    operatore: ">="
+    valore: 0.30
+
+  - id: DM236-art8.1.10-scala-alzata-pedata
+    titolo: Somma di due alzate e una pedata compresa tra 62 e 64 cm
+    fonte: {<<: *dm236, articolo: "art. 8, punto 8.1.10", estratto: "la somma tra il doppio dell'alzata e la pedata deve essere compresa tra 62/64 cm"}
+    ambito: IT
+    destinazione: [abitazione, altro]
+    interventi: [nuova, ristrutturazione]
+    elemento: scala_comune
+    grandezza: due_alzate_piu_pedata_m
+    operatore: tra
+    valore: [0.62, 0.64]
+    nota: "La formula è indicata per le scale comuni; per le scale private il decreto richiede soltanto il rapporto citato, con pedata minima 25 cm."
+
+  - id: DM236-art8.1.3-finestra-parapetto
+    titolo: Parapetto delle finestre alto almeno 1,00 m (quota del davanzale)
+    fonte: {<<: *dm236, articolo: "art. 8, punto 8.1.3", nota_fonte: "la copia di handylex.org riporta per refuso 'almeno 10 cm' invece di 100 cm: il valore va riscontrato sulla Gazzetta Ufficiale prima di aggiungere l'estratto"}
+    ambito: IT
+    destinazione: [abitazione, altro]
+    interventi: [nuova, ristrutturazione]
+    elemento: finestra
+    grandezza: quota_davanzale_m
+    operatore: ">="
+    valore: 1.00
+    nota: "Il decreto chiede un parapetto complessivo di almeno 100 cm, inattraversabile da una sfera di 10 cm, con parte opaca non oltre 60 cm. Riguarda anche la sicurezza dei bambini: con davanzale più basso servono protezioni."
+
+  - id: DM236-art8.1.6-lavabo
+    titolo: Piano superiore del lavabo a 0,80 m dal calpestio, senza colonna
+    fonte: {<<: *dm236, articolo: "art. 8, punto 8.1.6", estratto: "lo spazio necessario all'accostamento frontale della sedia a ruote al lavabo deve essere minimo di 80 cm misurati dal bordo anteriore del lavabo"}
+    ambito: IT
+    destinazione: [abitazione, altro]
+    interventi: [nuova, ristrutturazione]
+    elemento: lavabo
+    grandezza: altezza_piano_m
+    operatore: "=="
+    valore: 0.80
+    tolleranza: 0.01
+
+non_automatizzate:
+  - id: DM236-art8.0.2-spazi-manovra
+    titolo: Spazi di manovra con sedia a ruote (inversione, accostamento, antistanti alle porte)
+    fonte: {<<: *dm236, articolo: "art. 8, punto 8.0.2 e schemi grafici"}
+    motivo: "Il decreto li definisce con schemi grafici; vanno verificati sul disegno."
+  - id: DM236-art8.1.6-accostamento-sanitari
+    titolo: Spazio per l'accostamento laterale a w.c. e bidet (minimo 100 cm dall'asse), laterale alla vasca (140 cm), frontale al lavabo (80 cm)
+    fonte: {<<: *dm236, articolo: "art. 8, punto 8.1.6", estratto: "l'accostamento laterale alla tazza w.c., bidè, vasca, doccia, lavatrice e l'accostamento frontale al lavabo"}
+    motivo: "Richiede un controllo geometrico sul disegno degli apparecchi sanitari."
+  - id: DM236-art8.1.7-cucina
+    titolo: Spazio libero di almeno 70 cm di altezza sotto lavello e piano di cottura
+    fonte: {<<: *dm236, articolo: "art. 8, punto 8.1.7"}
+    motivo: "Non ancora modellato nella scheda."
+  - id: DM236-art8.1.8-balcone
+    titolo: Balconi e terrazze con spazio in cui sia inscrivibile una circonferenza di 140 cm
+    fonte: {<<: *dm236, articolo: "art. 8, punto 8.1.8", estratto: "balconi e terrazze dovranno avere almeno una spazio entro il quale sia inscrivibile una circonferenza di diametro 140 cm"}
+    motivo: "Non ancora modellato nella scheda."
+  - id: DM236-art8.1.2-pavimenti
+    titolo: Dislivelli di pavimento non superiori a 2,5 cm
+    fonte: {<<: *dm236, articolo: "art. 8, punto 8.1.2"}
+    motivo: "Non ancora modellato nella scheda."

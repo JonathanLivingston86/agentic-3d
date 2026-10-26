@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agentic 3D: guida di installazione</title>
+<style>
+:root { color-scheme: light dark; --fondo:#f6f5f2; --carta:#fff; --testo:#1d1d1b; --tenue:#6f6d66; --accento:#2f6f5e; --bordo:#dedbd3; --codice:#f0eee8; }
+@media (prefers-color-scheme: dark) { :root { --fondo:#1b1b1a; --carta:#252523; --testo:#ecebe6; --tenue:#a19f97; --accento:#6fb59f; --bordo:#3a3936; --codice:#30302d; } }
+* { box-sizing: border-box; }
+body { margin:0; background:var(--fondo); color:var(--testo); font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif; }
+main { max-width:860px; margin:0 auto; padding:40px 24px 80px; }
+h1 { font-size:30px; margin:0 0 4px; }
+h2 { font-size:21px; margin:44px 0 10px; padding-top:12px; border-top:1px solid var(--bordo); }
+h3 { font-size:17px; margin:24px 0 6px; }
+.sotto { color:var(--tenue); margin:0 0 28px; }
+nav { background:var(--carta); border:1px solid var(--bordo); border-radius:10px; padding:14px 20px; }
+nav ol { margin:6px 0 0; padding-left:22px; }
+a { color:var(--accento); }
+ol.passi > li { margin:10px 0; }
+code, .prompt { background:var(--codice); border-radius:5px; padding:1px 6px; font:14px ui-monospace,Consolas,monospace; }
+.prompt { display:block; padding:12px 14px; margin:10px 0; white-space:pre-wrap; border-left:3px solid var(--accento); }
+.nota { background:var(--carta); border:1px solid var(--bordo); border-left:4px solid var(--accento); border-radius:8px; padding:10px 16px; margin:14px 0; }
+table { border-collapse:collapse; width:100%; margin:10px 0; font-size:15px; }
+th, td { text-align:left; padding:8px 10px; border-bottom:1px solid var(--bordo); vertical-align:top; }
+/* disegni degli avvisi di sistema */
+.schermo { margin:16px 0 22px; display:flex; gap:16px; flex-wrap:wrap; }
+.finestra { flex:1 1 300px; border-radius:8px; overflow:hidden; box-shadow:0 2px 10px rgba(0,0,0,.18); font-size:14px; }
+.win { background:#0f4c81; color:#fff; padding:18px 20px 16px; }
+.win h4 { margin:0 0 8px; font-size:20px; font-weight:400; }
+.win p { margin:6px 0; }
+.win .link { text-decoration:underline; }
+.win .bottoni { text-align:right; margin-top:18px; }
+.mac { background:#ececec; color:#222; padding:18px 20px; text-align:center; }
+.mac .icona { font-size:34px; }
+.mac .bottoni { margin-top:14px; display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+.bottone { display:inline-block; padding:5px 14px; border-radius:5px; border:1px solid rgba(0,0,0,.25); background:#fff; color:#222; }
+.win .bottone { background:transparent; color:#fff; border-color:#fff; }
+.evidenza { outline:3px solid #f2b705; outline-offset:2px; font-weight:600; }
+.didascalia { flex-basis:100%; color:var(--tenue); font-size:14px; margin-top:-6px; }
+footer { margin-top:60px; color:var(--tenue); font-size:14px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Agentic 3D</h1>
+<p class="sotto">Guida di installazione e primi passi, per Windows e macOS.</p>
+
+<nav><strong>In questa guida</strong>
+<ol>
+<li><a href="#serve">Cosa serve</a></li>
+<li><a href="#windows">Installare su Windows</a></li>
+<li><a href="#mac">Installare su macOS</a></li>
+<li><a href="#dopo">Dopo l'installazione</a></li>
+<li><a href="#primo">Il primo lavoro</a></li>
+<li><a href="#render">Render e galleria</a></li>
+<li><a href="#problemi">Se qualcosa non va</a></li>
+<li><a href="#aggiornare">Aggiornare e disinstallare</a></li>
+</ol></nav>
+
+<h2 id="serve">1. Cosa serve</h2>
+<table>
+<tr><th>Requisito</th><th>Note</th></tr>
+<tr><td>Windows 10 o 11, oppure macOS 13 o successivo</td><td>Non servono diritti di amministratore.</td></tr>
+<tr><td>Un agente AI tra Claude (Code o desktop), Codex, Gemini CLI, Cursor, GitHub Copilot, OpenCode</td><td>Va installato prima di Agentic 3D: l'installazione lo trova e lo collega da sola.</td></tr>
+<tr><td>SketchUp desktop, 2021 o successivo</td><td>Per lavorare sul modello dal vivo. Va aperto almeno una volta prima dell'installazione.</td></tr>
+<tr><td>Blender (facoltativo)</td><td>Solo per i render; si scarica gratis da blender.org. Senza SketchUp, dopo i render il modello si apre in Blender.</td></tr>
+<tr><td>Connessione a internet</td><td>Durante l'installazione si scaricano i componenti necessari (uv e Python).</td></tr>
+</table>
+
+<h2 id="windows">2. Installare su Windows</h2>
+<ol class="passi">
+<li><strong>Estrarre lo ZIP</strong>: tasto destro sul file scaricato, <em>Estrai tutto...</em>, poi <em>Estrai</em>. L'installatore non funziona se si apre senza estrarre.</li>
+<li>Aprire la cartella <code>Windows</code> e fare doppio clic su <code>Installa.cmd</code>.</li>
+<li>Windows avvisa che il programma non è riconosciuto (l'installatore non ha una firma a pagamento). Fare clic su <strong>Ulteriori informazioni</strong>, poi su <strong>Esegui comunque</strong>.</li>
+</ol>
+<div class="schermo">
+<div class="finestra win"><h4>PC protetto da Windows</h4><p>Microsoft Defender SmartScreen ha impedito l'avvio di un'app non riconosciuta.</p><p class="link evidenza">Ulteriori informazioni</p><div class="bottoni"><span class="bottone">Non eseguire</span></div></div>
+<div class="finestra win"><h4>PC protetto da Windows</h4><p>App: Installa.cmd<br>Autore: Autore sconosciuto</p><div class="bottoni"><span class="bottone evidenza">Esegui comunque</span> <span class="bottone">Non eseguire</span></div></div>
+<p class="didascalia">Disegno indicativo: i testi possono cambiare leggermente con la versione di Windows.</p>
+</div>
+<ol class="passi" start="4">
+<li>Si apre una finestra che mostra cinque passi: uv, Agentic 3D, collegamento agli agenti, estensione per SketchUp, verifica. Richiede da uno a qualche minuto.</li>
+<li>Alla fine compare <em>Installazione completata</em>. Premere Invio per chiudere.</li>
+</ol>
+
+<h2 id="mac">3. Installare su macOS</h2>
+<ol class="passi">
+<li>Doppio clic sul file ZIP scaricato: il Mac lo estrae in una cartella.</li>
+<li>Aprire la cartella <code>Mac</code> e fare doppio clic su <code>Installa.command</code>.</li>
+<li>Il Mac avvisa che non può verificare lo sviluppatore (succede con ogni programma scaricato fuori dall'App Store; dopo l'installazione gli altri file della cartella non vengono più bloccati). Fare clic su <strong>Fine</strong> (o <strong>OK</strong>), poi aprire <em>Impostazioni di Sistema</em> &gt; <em>Privacy e sicurezza</em>, scorrere fino al messaggio su "Installa.command" e fare clic su <strong>Apri comunque</strong>. Confermare con la password del Mac se richiesta.</li>
+</ol>
+<div class="schermo">
+<div class="finestra mac"><div class="icona">&#9888;</div><p><strong>"Installa.command" non è stato aperto</strong></p><p>Apple non può verificare che sia privo di malware.</p><div class="bottoni"><span class="bottone evidenza">Fine</span><span class="bottone">Sposta nel Cestino</span></div></div>
+<div class="finestra mac"><p><strong>Privacy e sicurezza</strong></p><p>"Installa.command" è stato bloccato per proteggere il Mac.</p><div class="bottoni"><span class="bottone evidenza">Apri comunque</span></div></div>
+<p class="didascalia">Disegno indicativo: i testi possono cambiare leggermente con la versione di macOS.</p>
+</div>
+<ol class="passi" start="4">
+<li>Si apre il Terminale con gli stessi cinque passi di Windows. Alla fine compare <em>Installazione completata</em>: premere Invio e chiudere la finestra.</li>
+</ol>
+
+<h2 id="dopo">4. Dopo l'installazione</h2>
+<ol class="passi">
+<li><strong>Chiudere e riaprire l'agente AI</strong>, così vede gli strumenti e le Skill di Agentic 3D.</li>
+<li><strong>Aprire SketchUp</strong>: al primo avvio può chiedere di approvare l'estensione "Agentic 3D". Approvarla. Il menu <em>Estensioni &gt; Agentic 3D</em> conferma che è attiva.</li>
+<li><strong>Solo per Claude desktop</strong>: le Skill si caricano una volta a mano. La cartella con i file ZIP è indicata nella finestra di installazione; in Claude: <em>Personalizza &gt; Skill &gt; + &gt; Carica una skill</em>, un file alla volta.</li>
+</ol>
+
+<h2 id="primo">5. Il primo lavoro</h2>
+<p>La prima richiesta di ogni sessione comincia con <code>/agentic3d</code> (in Claude Code, OpenCode e Gemini CLI è un comando; in Codex si scrive <code>$agentic3d</code>; negli altri agenti basta scriverlo all'inizio del messaggio). Per esempio:</p>
+<span class="prompt">/agentic3d crea un nuovo lavoro chiamato "Prova" partendo dall'esempio "Appartamento di esempio" e costruiscilo. Poi dimmi quale file aprire in SketchUp.</span>
+<p>In SketchUp: <em>Estensioni &gt; Agentic 3D &gt; Collega modello...</em> e scegliere il file indicato dall'agente (nella cartella <em>Esportazioni</em> del lavoro). Da quel momento ogni modifica chiesta all'agente compare da sola in SketchUp.</p>
+<span class="prompt">Sposta il divano di 30 cm verso la finestra.</span>
+<p>Per un progetto proprio basta descriverlo, oppure dare all'agente una planimetria, un PDF, un DXF o la foto di uno schizzo con le quote. I lavori si trovano in <em>Documenti &gt; Agentic 3D</em>, una cartella per lavoro.</p>
+<div class="nota">Il controllo delle norme aiuta il progettista e non sostituisce la responsabilità del tecnico abilitato. Le norme comunali non sono verificate.</div>
+
+<h2 id="render">6. Render e galleria</h2>
+<p>Con Blender installato:</p>
+<span class="prompt">/agentic3d fai i render del lavoro "Prova".</span>
+<p>Blender lavora in sottofondo, senza finestre. L'agente racconta l'avanzamento ("render 3 di 7, mancano circa 40 secondi") e nel browser si apre una <strong>galleria</strong> che mostra ogni vista appena è pronta. Le immagini restano nella cartella <em>Render</em> del lavoro, il file di Blender nella cartella <em>Modello</em>.</p>
+<p>Se sul computer non c'è SketchUp, a fine render il modello si apre in Blender per continuare a lavorarci. Per cambiare questo comportamento, chiedere all'agente di modificare l'impostazione <code>dopo_render</code> (<code>automatico</code>, <code>apri</code> o <code>chiudi</code>). Un file di Blender modificato a mano non viene mai sovrascritto: il nuovo si salva accanto, con "(nuovo)" nel nome.</p>
+
+<h2 id="problemi">7. Se qualcosa non va</h2>
+<p>Scrivere all'agente:</p>
+<span class="prompt">/agentic3d verifica l'installazione e risolvi i problemi che trovi.</span>
+<p>L'agente controlla programma, cartelle, SketchUp, estensione, Blender e collegamento agli agenti, e applica i rimedi uno alla volta. Se l'installazione si è interrotta, il rapporto completo è in:</p>
+<ul>
+<li>Windows: <code>%APPDATA%\Agentic 3D\Rapporto installazione.txt</code></li>
+<li>macOS: <code>~/Library/Application Support/Agentic 3D/Rapporto installazione.txt</code></li>
+</ul>
+<p>Rilanciare l'installatore è sempre sicuro: ripara senza toccare i lavori.</p>
+
+<h2 id="aggiornare">8. Aggiornare e disinstallare</h2>
+<p><strong>Aggiornare</strong>: scaricare il pacchetto nuovo, estrarlo e lanciare di nuovo l'installatore. Poi riavviare l'agente e SketchUp.</p>
+<p><strong>Disinstallare</strong>: doppio clic su <code>Disinstalla</code> nella cartella <code>Windows</code> o <code>Mac</code>. Toglie il programma e il collegamento agli agenti; i lavori restano nella loro cartella. L'estensione di SketchUp si toglie da SketchUp: <em>Estensioni &gt; Gestione estensioni &gt; Agentic 3D &gt; Disinstalla</em>.</p>
+
+<footer>
+<p>Agentic 3D è ideato e sviluppato da Andrea Lucarelli. Uso consentito anche professionale; redistribuzione e rivendita vietate (vedi LICENZA.md). Software fornito senza garanzie e senza assistenza.</p>
+</footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,92 @@
+# Regole per gli edifici scolastici (Italia): indici del DM 18 dicembre 1975.
+# Valori letti dal testo indicato in `fonte.letto_da`, non a memoria.
+#
+# VIGENZA (verificata il 20 ottobre 2026): la legge 11 gennaio 1996 n. 23, art. 12 comma 5, dice che il DM
+# 18 dicembre 1975 non si applica, salvo quanto previsto dall'art. 5 comma 3. Lo stesso comma 3 prevede che, in
+# sede di prima applicazione e fino all'approvazione delle norme regionali, gli indici del DM possano essere
+# assunti come indici di riferimento. Le norme tecniche quadro previste dalla legge non risultano emanate come
+# indici numerici (il DI 11 aprile 2013 contiene linee guida di progetto, non codificate qui). Quindi: un FAIL
+# di queste regole significa "sotto l'indice di riferimento", non "vietato"; le norme regionali non sono verificate.
+#
+# Il decreto NON fissa un rapporto tra superficie finestrata e pavimento: per la luce naturale chiede un
+# fattore medio di luce diurna di 0,03 nelle aule (punto 5.2.5), che richiede un calcolo o una simulazione.
+#
+# Tipi di locale: `aula` (infanzia, primaria, secondaria di primo grado), `aula_secondaria_superiore`
+# (licei, istituti magistrali, tecnici, geometri). Dato facoltativo della scheda: `alunni`.
+#
+# Avviso: il controllo non sostituisce la responsabilità del tecnico abilitato.
+
+_fonti:
+  dmscuole: &dmscuole
+    atto: "Decreto ministeriale LL.PP. 18 dicembre 1975 (S.O. alla G.U. n. 29 del 2 febbraio 1976), norme tecniche per l'edilizia scolastica"
+    letto_da: "copia del testo (PDF 44 pagine, https://www.indicenormativa.it/sites/default/files/dm_18-12-75.pdf); altezze, indici di superficie e punto 3.0.8 concordano con edscuola.it; punto 5.2 letto solo dal PDF; non riscontrato su Gazzetta Ufficiale"
+    url: "https://www.indicenormativa.it/sites/default/files/dm_18-12-75.pdf"
+    livello_fonte: copia
+    data_verifica: 2026-10-20
+
+regole:
+  - id: DMscuole1975-tab4-altezza-aula
+    titolo: Altezza netta minima dello spazio per la classe (soffitto piano)
+    fonte: {<<: *dmscuole, articolo: "tabella 4 (riferimento al punto 3.0.9), riga 1", estratto: "Spazi per l'unità pedagogica (classe) 300 Con soffitto piano."}
+    avvertenza: "Edilizia scolastica: dal 1996 il DM 18 dicembre 1975 non si applica (L. 23/1996, art. 12 c. 5), salvo come indice di riferimento fino alle norme regionali (art. 5 c. 3). Norme regionali e regolamento locale non verificati."
+    ambito: IT
+    destinazione: [scuola]
+    interventi: [nuova, ristrutturazione, esistente]
+    locali: [aula, aula_secondaria_superiore]
+    grandezza: altezza_m
+    operatore: ">="
+    valore: 3.00
+    nota: "Con soffitto inclinato la tabella 4 indica un'altezza minima di 2,70 m; il modello supporta solo soffitti piani."
+
+  - id: DMscuole1975-tab5-7-superficie-alunno-primo-ciclo
+    titolo: Superficie netta minima per alunno per le attività didattiche normali (infanzia, primaria, secondaria di primo grado)
+    fonte: {<<: *dmscuole, articolo: "tabelle 5, 6 e 7 (riferimento al punto 3.0.9), attività normali 1,80 m2 per alunno",
+             estratto: "Attività didattiche: attività normali 1,80"}
+    ambito: IT
+    destinazione: [scuola]
+    interventi: [nuova, ristrutturazione, esistente]
+    locali: [aula]
+    grandezza: superficie_per_alunno_m2
+    operatore: ">="
+    valore: 1.80
+    nota: "Serve il numero di alunni nel campo `alunni` della stanza. La superficie del decreto è netta, al netto degli arredi: la stanza della scheda è al filo interno dei muri."
+
+  - id: DMscuole1975-tab8-12-superficie-alunno-secondaria-superiore
+    titolo: Superficie netta minima per alunno per le attività didattiche normali (secondaria di secondo grado)
+    fonte: {<<: *dmscuole, articolo: "tabelle 8, 9, 10, 11 e 12 (riferimento al punto 3.0.9), attività normali 1,96 m2 per alunno",
+             estratto: "Attività didattiche: - attività normali 1,96"}
+    ambito: IT
+    destinazione: [scuola]
+    interventi: [nuova, ristrutturazione, esistente]
+    locali: [aula_secondaria_superiore]
+    grandezza: superficie_per_alunno_m2
+    operatore: ">="
+    valore: 1.96
+    nota: "Serve il numero di alunni nel campo `alunni` della stanza."
+
+# Verifiche che il controllore NON calcola.
+non_automatizzate:
+  - id: DMscuole1975-5.2.5-fattore-luce-diurna
+    titolo: Fattore medio di luce diurna di 0,03 negli ambienti ad uso didattico (indicato come opportuno)
+    fonte: {<<: *dmscuole, articolo: "punto 5.2.5",
+             estratto: "Ambienti ad uso didattico (aule per lezione, studio, lettura, laboratori, disegno, ecc.) 0,03"}
+    destinazione: [scuola]
+    motivo: "Richiede un calcolo o una simulazione della luce naturale. Il decreto non fissa un rapporto tra superficie finestrata e pavimento."
+  - id: DMscuole1975-5.2.2-illuminamento
+    titolo: Illuminamento sul piano di lavoro di almeno 200 lux (300 lux sulle lavagne e nei locali per disegno)
+    fonte: {<<: *dmscuole, articolo: "punto 5.2.2",
+             estratto: "Sul piano di lavoro negli spazi per lezione, studio, lettura, laboratori, 200 negli uffici"}
+    destinazione: [scuola]
+    motivo: "Riguarda l'impianto di illuminazione, non la geometria del modello."
+  - id: DMscuole1975-5.2.6-oscuramento
+    titolo: Dispositivi per attenuare la luce naturale nei locali didattici
+    fonte: {<<: *dmscuole, articolo: "punto 5.2.6",
+             estratto: "dovranno essere muniti di dispositivi per attenuare il livello di illuminazione naturale"}
+    destinazione: [scuola]
+    motivo: "Tende o schermi non sono ancora modellati come requisito."
+  - id: DMscuole1975-3.0.8-distanza-edifici
+    titolo: Distanza libera dalle pareti opposte di almeno 4/3 dell'altezza prospiciente e non inferiore a 12 m
+    fonte: {<<: *dmscuole, articolo: "punto 3.0.8",
+             estratto: "tale distanza non dovrà, comunque, essere inferiore a 12 m"}
+    destinazione: [scuola]
+    motivo: "Dipende dal lotto e dagli edifici circostanti, non dalla stanza."

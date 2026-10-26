@@ -1,0 +1,80 @@
+# Indice delle norme tecniche UNI, EN, ISO e CEI (protette da copyright e a pagamento).
+# Il testo e i valori NON sono riprodotti. Qui restano numero, ambito e uso previsto, per sapere
+# dove guardare. I titoli vanno riscontrati sul catalogo UNI (https://store.uni.com) prima di citarli
+# in un documento: `titolo_verificato: false` significa scritto a memoria e da confermare.
+#
+# Se l'utente ha accesso legittimo al testo (abbonamento UNI, ordine professionale), i parametri
+# possono diventare regole in dati con la citazione esatta del punto e la data di verifica.
+
+norme:
+  - id: UNI-EN-ISO-19650
+    numero: "UNI EN ISO 19650-1 e -2"
+    ambito: "Gestione informativa con il BIM (Building Information Modelling): concetti, principi e fase di consegna"
+    uso: "Nomenclatura dei file, livelli di informazione, ambienti di condivisione dei dati"
+    titolo_verificato: false
+
+  - id: UNI-11337
+    numero: "UNI 11337 (serie)"
+    ambito: "Gestione digitale dei processi informativi delle costruzioni (BIM, edizione italiana)"
+    uso: "Livelli di fabbisogno informativo, schede informative, capitolato informativo"
+    titolo_verificato: false
+
+  - id: UNI-EN-17037
+    numero: "UNI EN 17037"
+    ambito: "Illuminazione naturale degli edifici"
+    uso: "Valutazione della luce diurna oltre il solo rapporto aeroilluminante del DM 1975"
+    titolo_verificato: false
+
+  - id: UNI-EN-12464-1
+    numero: "UNI EN 12464-1"
+    ambito: "Illuminazione dei posti di lavoro in interni"
+    uso: "Livelli di illuminamento per uffici, studi, locali commerciali"
+    titolo_verificato: false
+
+  - id: UNI-EN-16798-1
+    numero: "UNI EN 16798-1"
+    ambito: "Parametri ambientali interni e ventilazione per la prestazione energetica degli edifici"
+    uso: "Portate d'aria e comfort termico, acustico e luminoso"
+    titolo_verificato: false
+
+  - id: UNI-EN-ISO-128
+    numero: "UNI EN ISO 128 (serie)"
+    ambito: "Disegni tecnici: principi generali di presentazione"
+    uso: "Tipi di linea, viste, sezioni, quotatura delle tavole esportate"
+    titolo_verificato: false
+
+  - id: UNI-EN-ISO-7519
+    numero: "UNI EN ISO 7519"
+    ambito: "Disegni di costruzione: principi generali di presentazione"
+    uso: "Rappresentazione di piante e sezioni architettoniche"
+    titolo_verificato: false
+
+  - id: EUROCODICI
+    numero: "EN 1990 - EN 1999"
+    ambito: "Progettazione strutturale europea, base tecnica delle NTC 2018"
+    uso: "Solo riferimento: il modello 3D degli interni non è un calcolo strutturale"
+    titolo_verificato: false
+
+  - id: CEI-64-8
+    numero: "CEI 64-8"
+    ambito: "Impianti elettrici utilizzatori in bassa tensione"
+    uso: "Posizione e numero di prese e punti luce nelle stanze (livelli prestazionali)"
+    titolo_verificato: false
+
+  - id: EN-527-1
+    numero: "UNI EN 527-1"
+    ambito: "Tavoli da lavoro per ufficio: dimensioni"
+    uso: "Altezze e dimensioni di scrivanie"
+    titolo_verificato: false
+
+  - id: EN-1335-1
+    numero: "UNI EN 1335-1"
+    ambito: "Sedie da lavoro per ufficio: dimensioni"
+    uso: "Altezze e profondità di sedute operative"
+    titolo_verificato: false
+
+  - id: EN-1729-1
+    numero: "UNI EN 1729-1"
+    ambito: "Sedie e tavoli per istituzioni scolastiche: dimensioni"
+    uso: "Arredi scolastici"
+    titolo_verificato: false

@@ -1,0 +1,5 @@
+# A capo fissi per gli script degli installatori: LF per macOS, CRLF per Windows
+*.command text eol=lf
+*.sh text eol=lf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
