@@ -16,7 +16,7 @@ Ogni misura ha **una sola fonte**, la più precisa disponibile: il disegno CAD, 
 ### Disegno CAD (DXF): lettura automatica
 
 1. `importa_disegno` con il percorso del DXF: Agentic 3D legge da solo masse dei muri (anche disegnati con una faccia sola), vani con il tipo (comprese le ante scorrevoli disegnate lungo il muro), stanze con nome, altezza e superficie dai testi, controsoffitti e balconi, con le misure del CAD, e scrive la scheda e la **Tavola di lettura** (in `Riferimenti`). Non si legge il DXF in altri modi.
-2. Mostra la tavola all'utente insieme ai punti "DA CONFERMARE" del rapporto (spessori ipotizzati, davanzali non scritti, superfici calcolate diverse da quelle scritte, stanze non chiuse) e aspetta la conferma o le correzioni.
+2. La stessa chiamata scrive il **Confronto con il disegno** (`Riferimenti`: muri del modello in rosso e stanze in blu tratteggiato sopra il DXF, con le differenze) e la **Pianta quotata** (`Esportazioni`): due documenti distinti, la pianta si inoltra così com'è e il confronto (PDF e PNG) resta di uso interno. Mostra tavola e confronto all'utente insieme ai punti "DA CONFERMARE" del rapporto (spessori ipotizzati, davanzali non scritti, superfici calcolate diverse da quelle scritte, stanze non chiuse) e aspetta la conferma o le correzioni.
 3. Le correzioni si fanno con `modifica_scheda`; poi `costruisci`.
 4. Se la lettura non trova i muri, chiedi all'utente come si chiama il livello dei muri nel suo CAD e ripeti con `livello_muri`.
 
@@ -26,13 +26,15 @@ Ogni misura ha **una sola fonte**, la più precisa disponibile: il disegno CAD, 
 
 1. **Orientamento prima di tutto**: se molte quote si leggono capovolte, la foto è girata di 180 gradi; ruotala mentalmente prima di assegnare nord, sud, sinistra e destra.
 2. Leggi le quote una per una e scrivi la scheda (`edificio` con `pareti`, `stanze`, `aperture`), con ogni lettura incerta tra le ipotesi.
-3. **`tavola_di_lettura`**, poi mostra la tavola all'utente accanto alla foto: stanze, muri, aperture con le larghezze. Nessuna costruzione prima della sua conferma.
-4. Per leggere foto e schizzi serve un modello AI con buona visione: se le quote non si leggono con sicurezza, chiedile all'utente invece di indovinarle.
+3. Scrivi nella scheda il blocco **`sorgente`**, che lega il modello al disegno di partenza: `file` (nome del file in `Riferimenti`: PDF, PNG, JPG o DXF), `pagina` e `dpi` per un PDF (200 se non indicato), `punti` con almeno due, meglio tre o quattro, corrispondenze lontane tra loro `{modello: [x, y], disegno: [u, v]}` (u, v: pixel dell'immagine, con l'origine in alto a sinistra; per un PDF, pixel della pagina resa a quei `dpi`), e se servono `differenze` scelte e dichiarate (es. "muro obliquo con spessore unico"). Gli spigoli esterni dei muri sono buoni punti.
+4. **`tavola_di_lettura`**: scrive la tavola, la **Pianta quotata** (`Esportazioni`, da inoltrare così com'è) e, in un documento a parte di uso interno, il **Confronto con il disegno** (`Riferimenti`, PDF e PNG: muri del modello in rosso e stanze in blu tratteggiato sopra il disegno di partenza, con la percentuale di contorno che cade sulle linee e i muri che non coincidono). Il confronto si consegna sempre: senza `sorgente` il rapporto lo chiede. Mostra tavola e confronto all'utente accanto al disegno; un muro che non coincide si corregge o si spiega. Nessuna costruzione prima della sua conferma.
+5. Per leggere foto e schizzi serve un modello AI con buona visione: se le quote non si leggono con sicurezza, chiedile all'utente invece di indovinarle.
 
 ### Schizzo a mano o rilievo (nessun vettore)
 
 - Le quote scritte sono l'unica fonte: leggile una per una, girando l'immagine per quelle capovolte. Il disegno stampato di un catastale serve solo per la disposizione: non è in scala, e in foto è in prospettiva.
 - Guarda dove cadono i segni di quota: tra due filetti interni è una misura al filo interno; lungo una parete misurano da muro a muro. Converti in `da_m` dall'angolo sud-ovest.
+- **Le quote scritte vincono.** Se il disegno è già quotato, le misure scritte vanno nella scheda accanto a quelle del modello e la pianta quotata scrive quelle, salvo indicazioni diverse dell'utente: stanza `quote_scritte_cm: [larghezza, profondità]` (lungo i lati principali) e `superficie_scritta_m2`; apertura o vano `quote_scritte_cm: [larghezza, altezza]`. Ogni scarto oltre 2 cm (0,15 m2 per le superfici) compare tra le differenze del rapporto. La lettura dei DXF le scrive da sola.
 - **Le parziali devono chiudere sul totale.** Oltre 2-3 cm di scarto non si aggiusta in silenzio: scegli la lettura più coerente, scrivila tra i dubbi della scheda del progetto e chiedi una misura di controllo.
 - Ciò che il disegno non dice (davanzale, ante, lato della cerniera, finiture) resta al valore predefinito di `completa()` oppure va in `ipotesi_applicate`. Gli arredi che lo schizzo non mostra non si aggiungono.
 - Niente fascia di colore sulle pareti (`fascia_altezza_m`), colori o finiture particolari se il disegno o l'utente non li chiedono: pareti a tinta unica. Gli esempi del pacchetto mostrano il formato, non scelte da copiare.
@@ -42,7 +44,7 @@ Ogni misura ha **una sola fonte**, la più precisa disponibile: il disegno CAD, 
 
 - Finestre e porte finestre hanno lo stesso simbolo: chiedi quali sono porte finestre e dove sono i balconi, se il rilievo non lo segna (es. "PF"). Una larghezza che comprende due aperture vicine si divide con un montante.
 - Rettangolo con la diagonale: di solito armadio a muro (chiedi da quale stanza si apre e se ha ante scorrevoli: `tipo: porta`, `apertura: scorrevole`). Piccolo rettangolo pieno accanto ai muri: di solito pilastro. Nel dubbio chiedi se è pilastro, cavedio o nicchia.
-- Pilastri e risalti: si disegnano dal filo del muro verso la stanza (`da` sulla faccia del muro), uno per lato se il pilastro sporge da entrambi; un pezzo che parte dentro lo spessore di un muro dà l'avviso "si sovrappongono" e va ridisegnato.
+- Pilastri e risalti: si disegnano dal filo del muro verso la stanza (`da` sulla faccia del muro), uno per lato se il pilastro sporge da entrambi; un pezzo che parte dentro lo spessore di un muro dà l'avviso "si sovrappongono" e va ridisegnato. Lo spigolo di partenza sta esattamente sulla faccia (stessa coordinata calcolata, non arrotondata): a pochi millimetri dalla faccia il rapporto GEOMETRIA dà l'ERRORE "vertice quasi coincidente", perché SketchUp romperebbe il solido dei muri. L'ERRORE "giunto aperto" indica una fessura tra muri in un nodo: si controllano le linee delle pareti che vi arrivano.
 - Muro più sottile solo attorno a una finestra: è una nicchia. La finestra sta nel pezzo sottile e i tratti accanto restano spessi: ogni cambio di filo interno è un pezzo di facciata a sé.
 
 ## 3. Scheda stanze
@@ -70,6 +72,16 @@ Esempi completi nel pacchetto (strumento `esempi`): `Aula di esempio` (stanza si
 - **Riscontro con il disegno**: per ogni quota letta (dimensioni della stanza, altezza, aperture, posizione e profondità degli arredi) confronta il valore della scheda con il disegno, tolleranza 2,5 mm sui vettori. Una quota che non torna si corregge nella scheda, mai nel modello.
 - Guarda il risultato (SketchUp o render) e confrontalo con il disegno: misure, posizioni, orientamento.
 
-## 5. Consegna
+## 5. Pianta quotata
+
+`tavola_di_lettura` (e `importa_disegno`) scrive `Esportazioni/Pianta quotata.pdf` su A3, alla scala più grande che ci sta. Regole, già applicate dallo strumento; valgono anche se una pianta si disegna in altro modo:
+
+- **Mai quote di spessori e lunghezze dei muri esterni**: confinano spesso con altre unità e il loro spessore non è noto.
+- Solo misure essenziali, soprattutto negli spazi stretti (disimpegni, bagni): misure nette di ogni vano, posizione di porte e finestre dall'angolo della stanza, larghezza x altezza (con l'asterisco se l'altezza è ipotizzata), larghezza e profondità di risalti, nicchie e pilastri.
+- **Le quote stanno in pianta.** Prima di un richiamo si prova ogni posizione: numero sopra o sotto la linea, centrato anche se sporge dai trattini, più piccolo e più staccato, oltre un trattino, linea di quota spostata di qualche centimetro. Il **richiamo** (pallino, linea di riferimento, testo fuori pianta) solo se non c'è davvero posto, come per i nomi delle stanze più piccole. Un risalto senza posto non va in un richiamo: si omette e il rapporto lo elenca.
+- **I numeri non si sovrappongono e non toccano linee**: il rapporto riporta un ERRORE se due testi si intersecano oltre il 15% del più piccolo o se una linea (di quota, trattino, richiamo, faccia di muro) tocca un numero; con un errore la pianta non si consegna.
+- Le misure scritte sul disegno di partenza vincono su quelle ricalcolate.
+
+## 6. Consegna
 
 Riferisci: come è stato letto il disegno (scala, quote riscontrate), le ipotesi, l'esito del controllo norme (FAIL, NON VERIFICABILE, note) e il pacchetto (`esporta-per-sketchup`). Un'incongruenza trovata (finestra sotto il rapporto 1/8, davanzale sotto 1,00 m) è un risultato utile: va detta. I colori scelti per un disegno in bianco e nero sono una scelta tua: dichiarali. Pulizia finale con `lavoro-3d-ciclo-di-vita`.

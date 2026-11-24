@@ -71,7 +71,7 @@ def main(argv: list[str]) -> int:
         return 0
     if len(argv) >= 3 and argv[1] == "tavola":
         from .importa import tavola_di_lettura
-        print("Tavola:", tavola_di_lettura(trova_scheda(argv[2]).parent))
+        print(tavola_di_lettura(trova_scheda(argv[2]).parent))
         return 0
     if len(argv) >= 2 and argv[1] == "blender":
         from .blender.ponte import main as main_blender

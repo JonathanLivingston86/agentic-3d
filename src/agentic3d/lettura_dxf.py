@@ -50,6 +50,8 @@ class Lettura:
     letti: list[str] = field(default_factory=list)     # cosa è stato letto, per il rapporto
     dubbi: list[str] = field(default_factory=list)     # cosa non è stato letto o è ipotizzato
     livelli: dict = field(default_factory=dict)
+    origine: tuple = (0.0, 0.0)                        # punto del DXF che diventa l'origine del modello
+    fattore: float = 1.0                               # metri per unità del DXF
 
     def rapporto(self) -> str:
         righe = ["LETTURA DEL DISEGNO"] + [f"- {r}" for r in self.letti]
@@ -766,7 +768,7 @@ def leggi(percorso: str | Path, livelli: dict | None = None, nome: str = "Proget
                    and re.search(r"[A-Za-z]{3,}", t) and not re.search(r"piano|int\.|scala|quota|sez", t, re.I)
                    and _sembra_nome_di_stanza(t)]
     punti_stanza = [(x, y) for x, y, t in nomi_stanza if not RX_BALCONE.search(t)]
-    let = Lettura(scheda={}, livelli=ruoli)
+    let = Lettura(scheda={}, livelli=ruoli, origine=(x0, y0), fattore=fattore)
     let.letti.append(f"unità: {unita}; muri dal livello {', '.join(ruoli['muri'])}"
                      + (f", infissi da {', '.join(ruoli['infissi'])}" if ruoli["infissi"] else "")
                      + (f", proiezioni da {', '.join(ruoli['proiezioni'])}" if ruoli["proiezioni"] else ""))
@@ -895,6 +897,7 @@ def leggi(percorso: str | Path, livelli: dict | None = None, nome: str = "Proget
             scritta = st["aree"][0]
             scarto = area - scritta
             st["area_scritta"] = scritta
+            spec["superficie_scritta_m2"] = round(float(scritta), 2)   # la misura scritta sul disegno vince nella pianta quotata
             esito = "uguale" if abs(scarto) <= max(0.15, 0.02 * scritta) else f"DIVERSA di {scarto:+.2f} m2"
             let.letti.append(f"{st['id']}: {area:.2f} m2 calcolati, {scritta:.2f} scritti ({esito})"
                              + (f", h {alt_principale:.2f} m" if alt_principale else ""))
@@ -1128,12 +1131,13 @@ def leggi(percorso: str | Path, livelli: dict | None = None, nome: str = "Proget
         interno = all(in_stanza)
         ante_scorrevoli = _ante_scorrevoli(rett, dist, infissi_seg) if interno else 0
         quote = _quote_vicine(testi_m, (c.x, c.y))
-        nota, larghezza, altezza = "", dist, None
+        nota, larghezza, altezza, scritte = "", dist, None, None
         if quote:
             l_cm, h_cm = quote
             if abs(l_cm / 100 - dist) <= 0.08:
                 larghezza, altezza = l_cm / 100, h_cm / 100
                 nota = f"quote scritte {l_cm}/{h_cm}"
+                scritte = [round(float(l_cm), 1), round(float(h_cm), 1)]
         # un vuoto senza alcun segno (infisso, soglia, arco, quota) accanto a un muro a spessore ipotizzato nasce
         # dall'ipotesi, non dal disegno: è muro
         segni = vetri or arco or nota or any(pr.intersects(rett.buffer(0.02)) for pr in proiezioni)
@@ -1178,6 +1182,8 @@ def leggi(percorso: str | Path, livelli: dict | None = None, nome: str = "Proget
                 spec["ante"] = ante_scorrevoli
                 let.letti.append(f"{vid}: {ante_scorrevoli} {'ante scorrevoli' if ante_scorrevoli > 1 else 'anta scorrevole'} "
                                  "(disegnate accanto al vano, lungo il muro)")
+        if scritte:
+            spec["quote_scritte_cm"] = scritte
         elenco_vani.append(spec)
         let.vani.append((vid, tipo, rett, larghezza, nota))
 

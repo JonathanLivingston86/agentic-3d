@@ -12,6 +12,17 @@ from pathlib import Path
 import yaml
 
 NOME_TAVOLA = "Tavola di lettura.png"
+NOME_CONFRONTO = "Confronto con il disegno.pdf"         # con il PNG accanto
+NOME_PIANTA = "Pianta quotata.pdf"
+
+
+def pianta_e_confronto(cartella: Path, scheda: dict) -> str:
+    """Pianta quotata (Esportazioni, da inoltrare così com'è) e confronto con il disegno di partenza (Riferimenti, PDF
+    e PNG di uso interno): due documenti distinti, a ogni lettura di un disegno."""
+    from .pianta_quotata import crea
+    esito = crea(scheda, cartella / "Esportazioni" / NOME_PIANTA, cartella, cartella / "Riferimenti" / NOME_CONFRONTO,
+                 titolo=f"PIANTA - {scheda.get('progetto', cartella.name)}")
+    return esito.testo()
 
 
 def importa_disegno(cartella_lavoro: Path, disegno: str | Path, livello_muri: str | None = None,
@@ -43,7 +54,12 @@ def importa_disegno(cartella_lavoro: Path, disegno: str | Path, livello_muri: st
         if scheda_vecchia and chiave in scheda_vecchia:
             lettura.scheda[chiave] = scheda_vecchia[chiave]
     lettura.scheda["ipotesi_lettura"] = list(lettura.dubbi)
-    scheda = cartella / "Scheda stanze.yaml"
+    # corrispondenza tra modello e DXF, per il confronto con il disegno di partenza
+    ox, oy = lettura.origine
+    lettura.scheda["sorgente"] = {"file": copia.name, "punti": [
+        {"modello": [0.0, 0.0], "disegno": [round(float(ox), 6), round(float(oy), 6)]},
+        {"modello": [1.0, 0.0], "disegno": [round(float(ox + 1 / lettura.fattore), 6), round(float(oy), 6)]}]}
+    scheda =cartella / "Scheda stanze.yaml"
     if scheda.is_file() and temporanei is not None:
         temporanei.mkdir(parents=True, exist_ok=True)
         shutil.copy2(scheda, temporanei / f"{cartella.name} scheda {datetime.now():%Y%m%d %H%M%S}.yaml")
@@ -53,17 +69,23 @@ def importa_disegno(cartella_lavoro: Path, disegno: str | Path, livello_muri: st
     scheda.write_text(intestazione + yaml.safe_dump(lettura.scheda, allow_unicode=True, sort_keys=False, width=160),
                       encoding="utf-8")
     tavola = disegna(riferimenti / NOME_TAVOLA, lettura=lettura, titolo=f"Tavola di lettura: {nome}")
-    return (lettura.rapporto() + f"\n\nScheda scritta: {scheda}\nTavola da mostrare all'utente: {tavola}\n"
-            "Prima di costruire: l'utente confronta la tavola con il disegno e conferma o corregge.")
+    try:
+        pianta = pianta_e_confronto(cartella, lettura.scheda)
+    except Exception as e:                                  # la lettura resta valida anche senza la pianta
+        pianta = f"Pianta quotata e confronto non disegnati: {e}"
+    return (lettura.rapporto() + f"\n\nScheda scritta: {scheda}\nTavola da mostrare all'utente: {tavola}\n{pianta}\n"
+            "Prima di costruire: l'utente confronta tavola e confronto con il disegno e conferma o corregge.")
 
 
-def tavola_di_lettura(cartella_lavoro: Path) -> Path:
-    """Tavola dalla scheda attuale (per foto e schizzi: la lettura dell'agente da far confermare)."""
+def tavola_di_lettura(cartella_lavoro: Path) -> str:
+    """Tavola dalla scheda attuale (per foto e schizzi: la lettura dell'agente da far confermare), pianta quotata e
+    confronto con il disegno di partenza. Restituisce il rapporto con i file scritti."""
     from .scheda import carica_scheda
     from .tavola import disegna
     cartella = Path(cartella_lavoro)
     scheda = carica_scheda(cartella / "Scheda stanze.yaml")
     if "edificio" not in scheda:
         raise ValueError("la tavola di lettura si disegna per le schede con `edificio:` (più stanze)")
-    return disegna(cartella / "Riferimenti" / NOME_TAVOLA, scheda=scheda,
-                   titolo=f"Tavola di lettura: {scheda.get('progetto', cartella.name)} (lettura dell'agente)")
+    tavola = disegna(cartella / "Riferimenti" / NOME_TAVOLA, scheda=scheda,
+                     titolo=f"Tavola di lettura: {scheda.get('progetto', cartella.name)} (lettura dell'agente)")
+    return f"Tavola da mostrare all'utente: {tavola}\n" + pianta_e_confronto(cartella, scheda)

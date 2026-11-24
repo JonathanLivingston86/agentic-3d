@@ -23,7 +23,7 @@ Il motore si usa con gli strumenti MCP del server `Agentic 3D`; dove l'agente ha
 | `elenca_lavori`, `leggi_scheda`, `scrivi_scheda` | file `Scheda stanze.yaml` del lavoro | Leggere e scrivere tutta la scheda (`scrivi_scheda` la controlla e conserva la versione precedente) |
 | `modifica_scheda` | (solo MCP) | Modifica veloce: cambia solo le righe indicate, controlla norme e geometria, ricostruisce e aggiorna SketchUp in una chiamata |
 | `importa_disegno` | `agentic3d importa "<Nome>" disegno.dxf` | Lettura automatica di un DXF: scheda e tavola di lettura da confermare |
-| `tavola_di_lettura` | `agentic3d tavola "<Nome>"` | Pianta 2D della scheda da mostrare all'utente prima di costruire |
+| `tavola_di_lettura` | `agentic3d tavola "<Nome>"` | Tavola di lettura, Pianta quotata e Confronto con il disegno di partenza, da mostrare all'utente prima di costruire |
 | `controlla_norme` | `agentic3d controlla "<Nome>"` | Controllo delle norme |
 | `costruisci` | `agentic3d costruisci "<Nome>" --esporta [--render]` | Modello, GLB, file per SketchUp, render; riporta anche l'esito in SketchUp |
 | `rapporto_sketchup` | file di rapporto dell'estensione (`esporta-per-sketchup`) | Esito dell'ultimo aggiornamento in SketchUp |

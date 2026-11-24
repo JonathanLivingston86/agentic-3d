@@ -36,6 +36,7 @@ class Scena:
         self.oggetti: list[Oggetto] = []
         self._nomi: set[str] = set()
         self.note: list[str] = []
+        self.problemi: list[dict] = []     # problemi di geometria trovati costruendo (giunti aperti, vertici)
         self.meta: dict = {}               # informazioni per le viste: stanze, ingombro, finestre
 
     def aggiungi(self, ob: Oggetto) -> Oggetto:
@@ -55,7 +56,8 @@ class Scena:
 
     def verifica(self) -> list[dict]:
         from . import ergonomia
-        return vg.verifica(self.parti_per_verifica()) + ergonomia.controlla(self)
+        problemi = vg.verifica(self.parti_per_verifica()) + ergonomia.controlla(self) + list(self.problemi)
+        return sorted(problemi, key=lambda p: p["gravita"] != "ERRORE")
 
     def rapporto_geometria(self) -> str:
         return vg.rapporto_in_testo(self.verifica())

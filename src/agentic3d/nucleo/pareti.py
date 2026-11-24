@@ -170,7 +170,11 @@ def _sposta_il_cambio_di_spessore(nodo, va, vb, appoggiate, angoli) -> None:
     """Parete continua che cambia spessore proprio dove arriva un tramezzo: il cambio cade sulla faccia del tramezzo
     dal lato del pezzo più sottile, non sul suo asse. Altrimenti tra la testa del tramezzo (che arriva alla faccia
     più profonda) e il pezzo sottile resta un vuoto largo metà tramezzo (errore visto in prova
-    in un appartamento reale: rientranza quadrata nell'angolo)."""
+    in un appartamento reale: rientranza quadrata nell'angolo).
+
+    Con un tramezzo obliquo rispetto al muro il taglio segue la faccia del tramezzo (non la perpendicolare al muro):
+    spostare il cambio di metà tramezzo lungo l'asse lasciava scoperta la testa del tramezzo e una fessura di
+    alcuni centimetri tra tramezzo e pezzo sottile (errore visto con un muro di facciata obliquo da 44 e 35 cm)."""
     scelte = []
     for lato in (1.0, -1.0):
         sul_lato = [v for v in appoggiate if g.dot(v["d"], va["n"]) * lato > 0]
@@ -179,15 +183,28 @@ def _sposta_il_cambio_di_spessore(nodo, va, vb, appoggiate, angoli) -> None:
         if not sul_lato or abs(h_a - h_b) < 1e-6:
             continue
         sottile = va if h_a < h_b else vb
-        # faccia di ogni tramezzo rivolta verso il pezzo sottile
-        e = max(v["hl"] if g.dot(sottile["d"], v["n"]) > 0 else v["hr"] for v in sul_lato)
-        scelte.append((sottile, e))
+        h_spesso = max(h_a, h_b)
+        faccia_spessa = g.somma(nodo, g.per(va["n"], lato * h_spesso))
+        for v in sul_lato:
+            # faccia del tramezzo rivolta verso il pezzo sottile, come retta (punto, direzione)
+            segno = 1.0 if g.dot(sottile["d"], v["n"]) > 0 else -1.0
+            base = g.somma(nodo, g.per(v["n"], segno * (v["hl"] if segno > 0 else v["hr"])))
+            # quanto la testa del tramezzo arriva verso il pezzo sottile, sulla faccia del muro spesso
+            pt = g.intersezione_rette(base, v["d"], faccia_spessa, va["d"])
+            if pt is None or abs(g.croce(v["d"], va["d"])) < 0.2:
+                continue                         # tramezzo quasi parallelo al muro: si lascia com'è
+            scelte.append((sottile, g.dot(g.sottrai(pt, nodo), sottile["d"]), base, v["d"]))
     if not scelte or any(s[0] is not scelte[0][0] for s in scelte):
         return                                   # nessun cambio, o cambi opposti sui due lati: si lascia sull'asse
-    sottile, e = scelte[0][0], max(s[1] for s in scelte)
-    c = g.somma(nodo, g.per(sottile["d"], e))
+    sottile, _, base, direzione = max(scelte, key=lambda s: s[1])
     for v in (va, vb):
-        angoli[id(v)] = [g.somma(c, g.per(v["n"], v["hl"])), g.sottrai(c, g.per(v["n"], v["hr"]))]
+        nuovi = []
+        for p in (g.somma(nodo, g.per(v["n"], v["hl"])), g.sottrai(nodo, g.per(v["n"], v["hr"]))):
+            pt = g.intersezione_rette(base, direzione, p, v["d"])
+            if pt is None:
+                return
+            nuovi.append(pt)
+        angoli[id(v)] = nuovi
 
 
 RAPPORTO_TESTA = 1.3        # oltre questo rapporto tra gli spessori, nell'angolo il muro sottile si appoggia
@@ -242,6 +259,7 @@ def calcola_giunti(pezzi: list[Pezzo]) -> None:
         nodo = voci[0]["nodo"]
         k = len(voci)
         angoli = {}                       # voce -> [punto sinistro, punto destro] rispetto alla direzione uscente
+        da_coprire = set()                # voci la cui testa, per costruzione, appoggia tutta su un altro pezzo
         for v in voci:
             angoli[id(v)] = [g.somma(nodo, g.per(v["n"], v["hl"])), g.sottrai(nodo, g.per(v["n"], v["hr"]))]
         # due pareti in prosecuzione (direzioni opposte sulla stessa retta) formano una parete continua: teste
@@ -268,9 +286,11 @@ def calcola_giunti(pezzi: list[Pezzo]) -> None:
                     pt = g.intersezione_rette(base, v["d"], faccia_p, va["d"])
                     if pt is not None:
                         angoli[id(v)][idx] = pt
+                da_coprire.add(id(v))
             _sposta_il_cambio_di_spessore(nodo, va, vb, [v for v in voci if v is not va and v is not vb], angoli)
         elif k == 2 and _testa_contro_faccia(nodo, voci[0], voci[1], angoli):
-            pass
+            ta, tb = (voci[j]["hl"] + voci[j]["hr"] for j in (0, 1))
+            da_coprire.add(id(voci[1] if ta > tb else voci[0]))       # il sottile si ferma contro lo spesso
         elif k >= 2:
             for a in range(k):
                 v, succ = voci[a], voci[(a + 1) % k]
@@ -280,8 +300,15 @@ def calcola_giunti(pezzi: list[Pezzo]) -> None:
                 if p is not None and g.lunghezza(g.sottrai(p, nodo)) <= limite:
                     angoli[id(v)][0] = p
                     angoli[id(succ)][1] = p
+                    da_coprire.add((id(v), 0))
+                    da_coprire.add((id(succ), 1))
+            for v in voci:
+                if (id(v), 0) in da_coprire and (id(v), 1) in da_coprire:
+                    da_coprire.add(id(v))                            # giunto ad angolo su entrambi gli spigoli
         for v in voci:
             w = pezzi[v["i"]]
+            if id(v) in da_coprire:
+                w.extra.setdefault("teste_appoggiate", set()).add(v["e"])
             sin, des = angoli[id(v)]
             u_sin = g.dot(g.sottrai(sin, w.p0), w.eu)
             u_des = g.dot(g.sottrai(des, w.p0), w.eu)
@@ -358,6 +385,78 @@ def sovrapposizioni(pezzi: list[Pezzo], soglia_m2: float = 0.0025) -> list[tuple
             area = g.area(_ritaglia(impronte[id(w)], impronte[id(v)]) or [(0, 0)] * 3)
             if area > soglia_m2:
                 out.append((w.origine_id, v.origine_id, area))
+    return out
+
+
+def giunti_aperti(pezzi: list[Pezzo], sonda: float = 0.003) -> list[tuple[str, tuple[float, float]]]:
+    """Teste di pezzo che in un nodo dovrebbero appoggiarsi a un altro pezzo (tramezzo contro il muro che prosegue,
+    angolo, muro sottile contro quello spesso) e non lo toccano: (id della parete, nodo). In un giunto pulito,
+    appena oltre la testa di ogni pezzo c'è un altro pezzo; se c'è il vuoto, tra i muri resta una fessura che li
+    attraversa (errore visto con un muro obliquo che cambia spessore dove arriva un tramezzo). Si sonda a `sonda`
+    (3 mm) oltre la testa, in cinque punti lungo la testa; un vuoto conta come fessura se oltre c'è di nuovo muro
+    entro lo spessore massimo dei muri vicini."""
+    rete = pezzi if isinstance(pezzi, Rete) else Rete(pezzi)
+    conta: dict[tuple, int] = {}
+    for w in rete:
+        for p in (w.p0, w.p1):
+            conta[_chiave(p)] = conta.get(_chiave(p), 0) + 1
+    impronte = {id(w): impronta(w) for w in rete}
+    out = []
+    for w in rete:
+        for e, nodo in ((0, w.p0), (1, w.p1)):
+            if conta[_chiave(nodo)] < 2 or e not in w.extra.get("teste_appoggiate", ()):
+                continue                         # testa libera, o che può restare in vista (cambio di spessore)
+            a, b = w.punto_faccia(w.ui[e], "sinistra"), w.punto_faccia(w.uo[e], "destra")
+            fuori = w.eu if e == 1 else g.per(w.eu, -1.0)
+            lato = g.sottrai(b, a)
+            if g.lunghezza(lato) < 1e-6:
+                continue
+            nt = g.normale_sinistra(g.unitario(lato))
+            if g.dot(nt, fuori) < 0:
+                nt = g.per(nt, -1.0)             # normale della testa verso l'esterno del pezzo
+            vicini = [v for v in rete.vicine(nodo, 0.6) if v is not w]
+            portata = max([v.spessore for v in vicini] + [w.spessore])
+
+            def pieno(q):
+                return any(g.punto_in_poligono(q, impronte[id(v)]) for v in vicini)
+
+            for t in (0.1, 0.3, 0.5, 0.7, 0.9):
+                q = g.somma(g.somma(a, g.per(lato, t)), g.per(nt, sonda))
+                if pieno(q):
+                    continue
+                # vuoto oltre la testa: è una fessura solo se un altro muro torna entro lo spessore (altrimenti è
+                # la testa che sporge verso la stanza, come un muro spesso appoggiato alla fine di uno sottile)
+                passi = int(portata / 0.005) + 1
+                if any(pieno(g.somma(q, g.per(nt, 0.005 * j))) for j in range(1, passi + 1)):
+                    out.append((w.origine_id, (round(nodo[0], 3), round(nodo[1], 3))))
+                    break
+    return out
+
+
+VERTICE_QUASI = 0.003        # m: un vertice più vicino di così a una faccia, senza starci sopra, rompe SketchUp
+
+
+def vertici_quasi_coincidenti(pezzi: list[Pezzo], soglia: float = VERTICE_QUASI) -> list[tuple[str, str, float, tuple]]:
+    """Spigoli di un muro che cadono a meno di `soglia` (3 mm) da una faccia di un altro muro senza starci sopra:
+    (id della parete, id dell'altra, distanza in m, punto). I controlli del motore li accettano, ma SketchUp unisce
+    i punti così vicini e il solido dei muri si rompe (errore visto con un risalto che partiva a 1,3 mm dalla faccia
+    del muro invece che sulla faccia)."""
+    rete = pezzi if isinstance(pezzi, Rete) else Rete(pezzi)
+    impronte = {id(w): impronta(w) for w in rete if not w.curva}
+    out, visti = [], set()
+    for w in rete:
+        if w.curva:
+            continue
+        for p in impronte[id(w)]:
+            for v in rete.vicine(p, soglia):
+                if v is w or v.curva or v.origine_id == w.origine_id:
+                    continue
+                q = impronte[id(v)]
+                d = min(g.distanza_punto_segmento(p, q[i], q[(i + 1) % len(q)]) for i in range(len(q)))
+                chiave = (w.origine_id, v.origine_id)
+                if 1e-5 < d < soglia and chiave not in visti:
+                    visti.add(chiave)
+                    out.append((w.origine_id, v.origine_id, d, (round(p[0], 4), round(p[1], 4))))
     return out
 
 

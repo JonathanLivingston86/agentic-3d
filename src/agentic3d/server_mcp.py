@@ -107,12 +107,15 @@ def importa_disegno(lavoro: str, disegno: str, livello_muri: str | None = None) 
 @strumento
 def tavola_di_lettura(lavoro: str) -> str:
     """Disegna la pianta 2D di ciò che dice la scheda (stanze, muri, vani con le larghezze, altezze, balconi) nella
-    "Tavola di lettura.png" del lavoro. Per foto e schizzi è il passaggio obbligato: dopo aver scritto la scheda si
-    mostra la tavola all'utente, che la confronta con il disegno e conferma o corregge, prima di costruire."""
+    "Tavola di lettura.png" del lavoro, la "Pianta quotata.pdf" in Esportazioni (quote essenziali, numeri controllati
+    perché non si sovrappongano; si inoltra così com'è) e, se la scheda ha il blocco `sorgente`, il "Confronto con il
+    disegno" (PDF e PNG, uso interno) in Riferimenti (muri del modello in rosso e stanze in blu sopra il disegno di partenza, con le differenze). Per foto e
+    schizzi è il passaggio obbligato: si mostrano tavola e confronto all'utente, che conferma o corregge, prima di
+    costruire."""
     from .importa import tavola_di_lettura as tavola
     p = _scheda(lavoro)
     with _silenzioso():
-        return f"Tavola da mostrare all'utente: {tavola(p.parent)}"
+        return tavola(p.parent)
 
 
 @strumento
@@ -188,6 +191,20 @@ def _applica_modifiche(testo: str, modifiche: list[dict]) -> str:
     return testo
 
 
+def _prova_costruzione(testo: str) -> None:
+    """Costruisce in memoria la scheda modificata (pochi millisecondi, senza scrivere file): se non si costruisce,
+    la modifica si rifiuta e la scheda resta com'era (prima veniva salvata anche quando la costruzione falliva)."""
+    from .nucleo.costruzione import scena_da_scheda
+    from .scheda import completa
+    try:
+        dati = yaml.safe_load(testo)
+        with _silenzioso():
+            scena_da_scheda(completa(dati))
+    except Exception as e:
+        raise ValueError(f"la modifica non si costruisce ({e}): la scheda non è stata cambiata. "
+                         "Correggi le modifiche e riprova.") from None
+
+
 @strumento
 async def modifica_scheda(lavoro: str, modifiche: list[dict], ctx: Context, render: bool = False) -> str:
     """Modifica veloce di un lavoro già costruito, in una sola chiamata: applica le `modifiche` alla scheda
@@ -196,6 +213,7 @@ async def modifica_scheda(lavoro: str, modifiche: list[dict], ctx: Context, rend
     (per intero se c'è un problema). Render solo se l'utente li chiede."""
     p = _scheda(lavoro)
     testo = _applica_modifiche(p.read_text(encoding="utf-8"), modifiche)
+    _prova_costruzione(testo)
     _salva_scheda(p, lavoro, testo)
     from .controllo import controlla
     from .scheda import carica_scheda, completa

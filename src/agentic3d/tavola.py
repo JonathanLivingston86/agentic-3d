@@ -20,13 +20,26 @@ def _poligoni_della_scheda(scheda: dict):
     from .nucleo.pareti import impronta, risolvi
     piano = scheda["edificio"]["piani"][0]
     masse = [(m["id"], m.get("classe", "tamponatura"), Polygon(m["poligono_m"]), False) for m in piano.get("muri", []) or []]
-    if piano.get("pareti"):
-        masse += [(w.id, "tamponatura", Polygon(impronta(w)), False) for w in risolvi(piano["pareti"]) if not w.curva]
+    pezzi = risolvi(piano["pareti"]) if piano.get("pareti") else []
+    masse += [(w.id, "tamponatura", Polygon(impronta(w)), False) for w in pezzi if not w.curva]
     forme = [m[2] for m in masse]
     vani = []
     for v in piano.get("vani", []) or []:
         vv = mi.Vano(v, forme)
         vani.append((vv.id, vv.tipo, vv.forma, vv.larghezza, ""))
+    # porte e finestre delle schede con `pareti`: il vano attraversa il muro tra le due facce (prima non si
+    # disegnavano: la tavola mostrava solo i `vani` dei muri a impronta)
+    if piano.get("aperture") and pezzi:
+        from .nucleo.edificio import _risolvi_apertura, _Stanza
+        stanze_ed = {}
+        for s in piano.get("stanze", []):
+            st = _Stanza(s)
+            stanze_ed[st.id] = st
+        for ap in piano["aperture"]:
+            w, _, u0, u1 = _risolvi_apertura(ap, pezzi, stanze_ed)
+            forma = Polygon([w.punto_faccia(u0, "sinistra"), w.punto_faccia(u1, "sinistra"),
+                             w.punto_faccia(u1, "destra"), w.punto_faccia(u0, "destra")])
+            vani.append((ap["id"], ap["tipo"], forma, u1 - u0, ""))
     stanze = [{"id": s["id"], "pol": Polygon(s["poligono_m"]), "altezza": s.get("altezza_m", piano.get("altezza_m"))}
               for s in piano.get("stanze", [])]
     zone = [(s["id"], Polygon(z["poligono_m"]), z["altezza_m"]) for s in piano.get("stanze", [])

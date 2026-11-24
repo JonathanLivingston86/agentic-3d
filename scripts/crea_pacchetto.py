@@ -87,10 +87,16 @@ def comprimi(cartella: Path) -> Path:
 
 
 def repository_pubblico() -> Path:
+    """Rifà la copia pubblica conservando `.git`: da lì si pubblica su GitHub con commit e push."""
     cartella = DIST / "repository pubblico"
-    if cartella.exists():
-        shutil.rmtree(cartella)
-    cartella.mkdir(parents=True)
+    cartella.mkdir(parents=True, exist_ok=True)
+    for voce in cartella.iterdir():
+        if voce.name == ".git":
+            continue
+        if voce.is_dir():
+            shutil.rmtree(voce)
+        else:
+            voce.unlink()
     for voce in PUBBLICO:
         p = RADICE / voce
         dest = cartella / voce
@@ -113,7 +119,7 @@ def controlla_dati_personali(*cartelle: Path) -> list[str]:
     trovati = []
     for cartella in cartelle:
         for f in cartella.rglob("*"):
-            if not f.is_file() or f.suffix.lower() in (".png", ".zip"):
+            if not f.is_file() or f.suffix.lower() in (".png", ".zip") or ".git" in f.relative_to(cartella).parts:
                 continue
             if f.suffix == ".whl":
                 with zipfile.ZipFile(f) as z:

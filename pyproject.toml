@@ -1,6 +1,6 @@
 [project]
 name = "agentic3d"
-version = "1.1.3"
+version = "1.1.4"
 description = "Modellazione 3D di interni guidata da un agente, con norme italiane ed europee e SketchUp dal vivo"
 readme = "README.md"
 authors = [{ name = "Andrea Lucarelli" }]

@@ -27,7 +27,8 @@ from .architettura import lastra, muro
 from .arredi import Contesto, arredo
 from .forme import telaio_cardinale
 from . import muri_impronta as mi
-from .pareti import Pezzo, faccia_che_copre, pezzo_che_contiene, risolvi, sovrapposizioni
+from .pareti import (Pezzo, faccia_che_copre, giunti_aperti, pezzo_che_contiene, risolvi, sovrapposizioni,
+                     vertici_quasi_coincidenti)
 from .scena import Oggetto, Scena
 
 CARDINALI = {"est": (1.0, 0.0), "nord": (0.0, 1.0), "ovest": (-1.0, 0.0), "sud": (0.0, -1.0)}
@@ -413,6 +414,19 @@ def scena_da_edificio(scheda: dict, muri_uniti: bool = True) -> Scena:
             scena.note.append(f"{piano.get('id', f'Piano {k + 1}')}: le pareti {a_id} e {b_id} si sovrappongono "
                               f"({area:.2f} m2 in pianta): un pilastro o un risalto si disegna dal filo del muro "
                               "verso la stanza (uno per lato, se sporge da entrambi), non dentro o attraverso il muro")
+        for pid, nodo in giunti_aperti(pezzi):
+            scena.problemi.append({
+                "gravita": "ERRORE", "tipo": "giunto aperto", "oggetti": (f"Muro {pid}",), "mm": 0.0,
+                "dettaglio": f"{piano.get('id', f'Piano {k + 1}')}: la parete {pid} non tocca le altre pareti nel nodo "
+                             f"({nodo[0]:.3f}; {nodo[1]:.3f}): tra i muri resta una fessura"})
+        for a_id, b_id, d, punto in vertici_quasi_coincidenti(pezzi):
+            scena.problemi.append({
+                "gravita": "ERRORE", "tipo": "vertice quasi coincidente", "oggetti": (f"Muro {a_id}", f"Muro {b_id}"),
+                "mm": d * 1000,
+                "dettaglio": f"{piano.get('id', f'Piano {k + 1}')}: uno spigolo della parete {a_id} in "
+                             f"({punto[0]:.4f}; {punto[1]:.4f}) è a {d * 1000:.1f} mm da una faccia della parete {b_id} "
+                             "senza toccarla: SketchUp rompe il solido dei muri. Porta lo spigolo sulla faccia "
+                             "(stessa coordinata) o allontanalo"})
         stanze = {}
         for s in piano.get("stanze", []):
             st = _Stanza(s)

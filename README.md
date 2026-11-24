@@ -1,6 +1,6 @@
 # Agentic 3D
 
-Modellazione 3D di interni guidata da un agente AI: da un brief, una planimetria o uno schizzo con le quote a un modello controllato sulle norme italiane ed europee, che si apre e si aggiorna dal vivo in SketchUp.
+Modellazione 3D di interni guidata da un agente AI: da un brief, una planimetria o uno schizzo con le quote a un modello controllato sulle norme italiane ed europee, che si apre e si aggiorna dal vivo in SketchUp, e a una pianta 2D quotata pronta da inoltrare.
 
 ![Flusso di Agentic 3D](docs/Flusso%20di%20Agentic%203D.png)
 
@@ -19,8 +19,9 @@ Serve uno di questi agenti: Claude (Code o desktop), Codex, Gemini CLI, Cursor, 
 1. L'agente segue le **Skill** di Agentic 3D (procedure di mestiere nel formato aperto Agent Skills) e usa gli strumenti del **server MCP** di Agentic 3D.
 2. Il progetto è descritto in una **scheda** di testo (stanze, pareti, aperture, arredi); i valori mancanti vengono scelti in modo coerente con le norme e dichiarati come ipotesi.
 3. Il **motore** costruisce la geometria, controlla compenetrazioni, parti sospese, porte bloccate e arredi davanti alle finestre, verifica le norme (regole in dati con fonte e articolo) e scrive in pochi millisecondi il modello per SketchUp e il file GLB.
-4. L'**estensione per SketchUp** costruisce gruppi, componenti e solidi puliti, si aggiorna da sola a ogni modifica e rimanda all'agente un rapporto di controllo.
-5. **Blender** (facoltativo) fa i render in sottofondo, con avanzamento e una galleria che si riempie nel browser.
+4. Quando si parte da un disegno, il motore produce anche la **pianta quotata** in PDF e DXF (una pagina A3 alla scala più grande che ci sta, misure nette dei vani, posizione e dimensioni delle aperture, quote dentro la pianta e richiami solo dove manca lo spazio) e un **confronto con il disegno di partenza**, per uso interno, che mostra quanto il modello coincide con l'originale. Le misure scritte sul disegno prevalgono su quelle ricavate in scala.
+5. L'**estensione per SketchUp** costruisce gruppi, componenti e solidi puliti, si aggiorna da sola a ogni modifica e rimanda all'agente un rapporto di controllo.
+6. **Blender** (facoltativo) fa i render in sottofondo, con avanzamento e una galleria che si riempie nel browser.
 
 Il controllo delle norme aiuta il progettista e non sostituisce la responsabilità del tecnico abilitato.
 
